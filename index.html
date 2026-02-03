@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>Do you love me?</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       height: 100vh;
@@ -16,13 +18,15 @@
 
     .container {
       position: relative;
-      width: 420px;
+      width: 90%;
+      max-width: 420px;
       height: 320px;
       background: white;
       border-radius: 20px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.2);
       text-align: center;
       padding-top: 40px;
+      overflow: hidden;
     }
 
     h2 {
@@ -55,10 +59,12 @@
       position: absolute;
       background: linear-gradient(135deg, #ff758c, #ff7eb3);
       color: white;
+      transition: left 0.25s ease, top 0.25s ease;
     }
   </style>
 </head>
 <body>
+
   <div class="container">
     <h2>Do you love me? 💖</h2>
     <button id="yes" onclick="alert('I knew it 😍❤️')">Yes</button>
@@ -66,36 +72,38 @@
   </div>
 
   <script>
-  const noButton = document.getElementById("no");
-  const container = document.querySelector(".container");
+    const noButton = document.getElementById("no");
+    const container = document.querySelector(".container");
 
-  let lastMove = 0;
-
-  container.addEventListener("mousemove", (e) => {
-    const now = Date.now();
-    if (now - lastMove < 300) return; // slow it down
-    lastMove = now;
-
-    const btnRect = noButton.getBoundingClientRect();
-    const mouseX = e.clientX;
-    const mouseY = e.clientY;
-
-    const distance = Math.hypot(
-      mouseX - (btnRect.left + btnRect.width / 2),
-      mouseY - (btnRect.top + btnRect.height / 2)
-    );
-
-    if (distance < 300) {
-      const containerRect = container.getBoundingClientRect();
-
-      const x = Math.random() * (containerRect.width - btnRect.width);
-      const y = Math.random() * (containerRect.height - btnRect.height);
-
+    function moveNoButton() {
+      const rect = container.getBoundingClientRect();
+      const x = Math.random() * (rect.width - noButton.offsetWidth);
+      const y = Math.random() * (rect.height - noButton.offsetHeight);
       noButton.style.left = x + "px";
       noButton.style.top = y + "px";
     }
-  });
-</script>
+
+    // Desktop: move when cursor is close
+    let lastMove = 0;
+    container.addEventListener("mousemove", (e) => {
+      const now = Date.now();
+      if (now - lastMove < 300) return;
+
+      const btnRect = noButton.getBoundingClientRect();
+      const distance = Math.hypot(
+        e.clientX - (btnRect.left + btnRect.width / 2),
+        e.clientY - (btnRect.top + btnRect.height / 2)
+      );
+
+      if (distance < 100) {
+        moveNoButton();
+        lastMove = now;
+      }
+    });
+
+    // Mobile + fallback: move every 0.5 seconds
+    setInterval(moveNoButton, 500);
+  </script>
 
 </body>
 </html>
